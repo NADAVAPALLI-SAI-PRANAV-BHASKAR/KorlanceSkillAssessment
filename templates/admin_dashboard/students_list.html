@@ -1,0 +1,135 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+{% load static %}
+
+{% block admin_content %}
+<div class="space-y-6">
+  
+  <!-- Header with Search & Filter -->
+  <div class="korlance-card p-6">
+    <form method="GET" action="{% url 'students_list' %}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      
+      <!-- Text Search -->
+      <div class="md:col-span-2 relative">
+        <input 
+          type="text" 
+          name="q" 
+          value="{{ search_query }}" 
+          placeholder="Search by student name, email, or mobile..." 
+          class="w-full pl-10 pr-4 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-korlance-primary/30"
+        >
+        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3"></i>
+      </div>
+
+      <!-- Domain Filter -->
+      <div>
+        <select name="domain" class="w-full py-2.5 px-3 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:outline-none">
+          <option value="">All Domains (20)</option>
+          {% for d in domains %}
+            <option value="{{ d.id }}" {% if selected_domain == d.id|stringformat:"i" %}selected{% endif %}>
+              {{ d.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Status Filter & Submit -->
+      <div class="flex items-center gap-2">
+        <select name="status" class="w-full py-2.5 px-3 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:outline-none">
+          <option value="">All Statuses</option>
+          <option value="COMPLETED" {% if selected_status == 'COMPLETED' %}selected{% endif %}>Completed</option>
+          <option value="PENDING" {% if selected_status == 'PENDING' %}selected{% endif %}>Pending</option>
+        </select>
+        
+        <button type="submit" class="btn-korlance-primary text-xs py-2.5 px-4 shrink-0">
+          Filter
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Candidates Table -->
+  <div class="korlance-card overflow-hidden">
+    <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+      <div>
+        <h3 class="text-sm font-extrabold text-slate-900">Registered Candidates</h3>
+        <p class="text-xs text-slate-400">Total matched: {{ total_count }}</p>
+      </div>
+      <a href="{% url 'export_report' %}?action=download{% if selected_domain %}&domain={{ selected_domain }}{% endif %}" class="btn-korlance-secondary text-xs px-3.5 py-1.5">
+        <i data-lucide="download" class="w-3.5 h-3.5"></i>
+        <span>Export Filtered Roster</span>
+      </a>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-xs">
+        <thead class="bg-slate-50 border-b border-slate-200/80 text-slate-500 uppercase tracking-wider font-bold">
+          <tr>
+            <th class="px-6 py-3.5">Candidate Details</th>
+            <th class="px-6 py-3.5">Mobile Number</th>
+            <th class="px-6 py-3.5">Target Domain</th>
+            <th class="px-6 py-3.5">Source</th>
+            <th class="px-6 py-3.5">Examination Status</th>
+            <th class="px-6 py-3.5">Score / Category</th>
+            <th class="px-6 py-3.5">Registered On</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 text-slate-700 font-medium">
+          {% for student in students %}
+          {% with attempt=student.latest_attempt %}
+          <tr class="hover:bg-slate-50/80 transition-colors">
+            <td class="px-6 py-4">
+              <div class="font-bold text-slate-900">{{ student.full_name }}</div>
+              <div class="text-[11px] text-slate-400 font-mono">{{ student.email }}</div>
+            </td>
+            <td class="px-6 py-4 font-mono text-slate-600">{{ student.mobile_number }}</td>
+            <td class="px-6 py-4 font-semibold text-korlance-primary">{{ student.target_domain.name }}</td>
+            <td class="px-6 py-4">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold {% if student.source == 'EXCEL_IMPORT' %}bg-blue-50 text-blue-700 border border-blue-200{% else %}bg-purple-50 text-purple-700 border border-purple-200{% endif %}">
+                {{ student.get_source_display }}
+              </span>
+            </td>
+            <td class="px-6 py-4">
+              {% if attempt and attempt.is_submitted %}
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  Completed
+                </span>
+              {% elif attempt %}
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                  In Progress
+                </span>
+              {% else %}
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                  Pending
+                </span>
+              {% endif %}
+            </td>
+            <td class="px-6 py-4">
+              {% if attempt and attempt.is_submitted %}
+                <div class="font-bold text-slate-900">{{ attempt.total_score|floatformat:1 }} / 100</div>
+                <div class="text-[10px] font-bold {% if attempt.performance_category == 'CATEGORY_1' %}text-emerald-700{% elif attempt.performance_category == 'CATEGORY_2' %}text-amber-700{% else %}text-rose-700{% endif %}">
+                  {{ attempt.get_performance_category_display }}
+                </div>
+              {% else %}
+                <span class="text-slate-400">—</span>
+              {% endif %}
+            </td>
+            <td class="px-6 py-4 text-slate-400 text-[11px] font-mono">
+              {{ student.created_at|date:"Y-m-d" }}
+            </td>
+          </tr>
+          {% endwith %}
+          {% empty %}
+          <tr>
+            <td colspan="7" class="px-6 py-10 text-center text-slate-400">
+              No candidates matching your query were found.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock admin_content %}

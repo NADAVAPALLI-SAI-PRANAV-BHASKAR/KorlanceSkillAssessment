@@ -1,0 +1,83 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+{% load static %}
+
+{% block admin_content %}
+<div class="space-y-6 max-w-2xl">
+  
+  <div class="korlance-card p-6 bg-gradient-to-r from-purple-50 via-white to-white border-purple-200">
+    <div class="flex items-start gap-4">
+      <div class="w-12 h-12 rounded-xl bg-purple-100 text-korlance-primary flex items-center justify-center shrink-0">
+        <i data-lucide="mail-cog" class="w-6 h-6"></i>
+      </div>
+      <div>
+        <h3 class="text-base font-extrabold text-slate-900">SMTP Gateway & Notification Dispatch Settings</h3>
+        <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+          Configure corporate SMTP credentials for automated examination invitation delivery, candidate completion receipts, and consolidated Excel report dispatch to the primary controller email.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="korlance-card p-8">
+    <form method="POST" action="{% url 'smtp_settings' %}" class="space-y-5 text-xs">
+      {% csrf_token %}
+
+      <div class="grid grid-cols-3 gap-4">
+        <div class="col-span-2">
+          <label class="block font-bold text-slate-700 uppercase mb-1">SMTP Host</label>
+          <input type="text" name="host" value="{{ config.host }}" required class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-mono">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 uppercase mb-1">Port</label>
+          <input type="number" name="port" value="{{ config.port }}" required class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-mono">
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <input type="checkbox" id="use_tls" name="use_tls" {% if config.use_tls %}checked{% endif %} class="w-4 h-4 text-korlance-primary rounded">
+        <label for="use_tls" class="font-bold text-slate-700 cursor-pointer">Enable STARTTLS Transport Encryption</label>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block font-bold text-slate-700 uppercase mb-1">SMTP Username / Email</label>
+          <input type="text" name="username" value="{{ config.username }}" placeholder="notifications@korlance.com" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-mono">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 uppercase mb-1">SMTP Password / App Key</label>
+          <input type="password" name="password" placeholder="••••••••••••" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-mono">
+        </div>
+      </div>
+
+      <div>
+        <label class="block font-bold text-slate-700 uppercase mb-1">Default From Email Header</label>
+        <input type="text" name="from_email" value="{{ config.from_email }}" required class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-mono">
+      </div>
+
+      <!-- Admin Recipient Setting (Shaikbaji15102002@gmail.com) -->
+      <div class="p-4 bg-purple-50 rounded-xl border border-purple-200">
+        <label class="block font-bold text-purple-900 uppercase mb-1">Consolidated Report Destination Admin Email</label>
+        <input 
+          type="email" 
+          name="admin_recipient_email" 
+          value="{{ config.admin_recipient_email }}" 
+          required 
+          class="w-full p-2.5 bg-white border border-purple-300 rounded-xl font-mono text-purple-900 font-bold"
+        >
+        <p class="text-[11px] text-purple-700/80 mt-1.5">
+          Consolidated examination Excel workbooks and incident reports will be delivered to this verified email address.
+        </p>
+      </div>
+
+      <div class="pt-4 border-t border-slate-100 flex items-center justify-end">
+        <button type="submit" class="btn-korlance-primary text-xs py-3 px-6 shadow-md">
+          <i data-lucide="save" class="w-4 h-4"></i>
+          <span>Save SMTP Configuration</span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+</div>
+{% endblock admin_content %}

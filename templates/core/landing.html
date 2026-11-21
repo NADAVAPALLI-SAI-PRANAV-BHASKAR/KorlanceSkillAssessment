@@ -1,0 +1,324 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}KORLANCE — Enterprise Multi-Domain Online Assessment Platform{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="relative overflow-hidden pt-12 pb-24 md:pt-20 md:pb-32 bg-gradient-to-b from-purple-50/60 via-white to-[#F8F7FC]">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="text-center max-w-3xl mx-auto space-y-6">
+      
+      <!-- Top Corporate Badge -->
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-korlance-light border border-purple-200 shadow-sm text-xs font-bold text-korlance-primary uppercase tracking-wider">
+        <span class="w-2 h-2 rounded-full bg-korlance-primary animate-ping"></span>
+        <span>KORLANCE PRIVATE LIMITED • BUILD TODAY, LEAD TOMORROW.</span>
+      </div>
+
+      <!-- Main Headline -->
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.15]">
+        Enterprise-Grade <span class="bg-gradient-to-r from-korlance-primary via-purple-600 to-indigo-600 bg-clip-text text-transparent">Multi-Domain</span> Online Examination Platform
+      </h1>
+
+      <!-- Subtitle -->
+      <p class="text-base sm:text-lg text-slate-600 font-medium leading-relaxed">
+        A secure, proctored corporate assessment system engineered for comprehensive candidate evaluation across 20 high-demand engineering and management disciplines.
+      </p>
+
+      <!-- Key Metrics Row -->
+      <div class="pt-4 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-2xl mx-auto text-left">
+        <div class="p-3.5 bg-white border border-slate-200/90 rounded-xl shadow-xs">
+          <div class="text-2xl font-black text-korlance-primary">20</div>
+          <div class="text-xs font-semibold text-slate-500 uppercase">Specialized Domains</div>
+        </div>
+        <div class="p-3.5 bg-white border border-slate-200/90 rounded-xl shadow-xs">
+          <div class="text-2xl font-black text-korlance-primary">50</div>
+          <div class="text-xs font-semibold text-slate-500 uppercase">MCQs Per Exam</div>
+        </div>
+        <div class="p-3.5 bg-white border border-slate-200/90 rounded-xl shadow-xs">
+          <div class="text-2xl font-black text-korlance-primary">40 Mins</div>
+          <div class="text-xs font-semibold text-slate-500 uppercase">Timed Assessment</div>
+        </div>
+        <div class="p-3.5 bg-white border border-slate-200/90 rounded-xl shadow-xs">
+          <div class="text-2xl font-black text-korlance-primary">100</div>
+          <div class="text-xs font-semibold text-slate-500 uppercase">Maximum Marks</div>
+        </div>
+      </div>
+
+      <!-- CTAs -->
+      <div class="pt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="{% url 'register' %}" class="btn-korlance-primary w-full sm:w-auto text-sm py-3.5 px-8">
+          <span>Register for Examination</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </a>
+        <a href="#domains-section" class="btn-korlance-secondary w-full sm:w-auto text-sm py-3 px-6">
+          <i data-lucide="layers" class="w-4 h-4"></i>
+          <span>View 20 Domains</span>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- 20 Assessment Domains Section -->
+<section id="domains-section" class="py-20 bg-white border-y border-slate-200/80">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+      <div>
+        <div class="text-xs font-bold text-korlance-primary uppercase tracking-wider mb-2">Curriculum Breadth</div>
+        <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Available Assessment Domains (20)</h2>
+        <p class="text-sm text-slate-500 mt-2 max-w-xl">
+          Each domain features 50 curated technical MCQs categorized into Easy (15), Medium (25), and Hard (10) difficulty benchmarks.
+        </p>
+      </div>
+
+      <!-- Search Input Filter -->
+      <div class="w-full md:w-72 relative">
+        <input 
+          type="text" 
+          id="domainSearchInput" 
+          placeholder="Filter domains..." 
+          class="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-korlance-primary/30 focus:border-korlance-primary"
+        >
+        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5"></i>
+      </div>
+    </div>
+
+    <!-- Domain Grid -->
+    <div id="domainGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {% for domain in domains %}
+      <div class="domain-card korlance-card korlance-card-hover p-6 flex flex-col justify-between" data-name="{{ domain.name|lower }}">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <span class="px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider bg-purple-50 text-korlance-primary rounded-md border border-purple-100">
+              {{ domain.badge }}
+            </span>
+            <span class="text-xs font-bold text-slate-400">#{{ forloop.counter }}</span>
+          </div>
+          <h3 class="text-base font-bold text-slate-900 group-hover:text-korlance-primary transition-colors leading-snug">
+            {{ domain.name }}
+          </h3>
+          <p class="text-xs text-slate-500 mt-2 line-clamp-3 leading-relaxed">
+            {{ domain.description }}
+          </p>
+        </div>
+
+        <div class="pt-6 mt-6 border-t border-slate-100 flex items-center justify-between">
+          <span class="text-xs font-semibold text-slate-500 flex items-center gap-1">
+            <i data-lucide="help-circle" class="w-3.5 h-3.5 text-purple-600"></i>
+            <span>50 MCQs</span>
+          </span>
+          <a href="{% url 'register' %}?domain={{ domain.id }}" class="text-xs font-bold text-korlance-primary hover:text-korlance-deep inline-flex items-center gap-1">
+            <span>Select Domain</span>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+
+<!-- Examination Pattern & Rules Section -->
+<section id="guidelines-section" class="py-20 bg-[#F8F7FC]">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-3xl mx-auto mb-16 space-y-3">
+      <div class="text-xs font-bold text-korlance-primary uppercase tracking-wider">Evaluation Framework</div>
+      <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Standardized Examination Pattern</h2>
+      <p class="text-sm text-slate-500">
+        All assessments adhere to strict corporate examination standards with continuous online proctoring and automated server-side evaluation.
+      </p>
+    </div>
+
+    <!-- 2 Column Overview: Pattern Table + Merit Categories -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+      
+      <!-- Pattern Table Card -->
+      <div class="korlance-card p-8">
+        <h3 class="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+          <i data-lucide="clipboard-check" class="w-5 h-5 text-korlance-primary"></i>
+          <span>Official Examination Blueprint</span>
+        </h3>
+
+        <div class="divide-y divide-slate-100">
+          <div class="py-3.5 flex items-center justify-between text-sm">
+            <span class="font-medium text-slate-500">Total Multiple Choice Questions</span>
+            <span class="font-bold text-slate-900">50 Questions</span>
+          </div>
+          <div class="py-3.5 flex items-center justify-between text-sm">
+            <span class="font-medium text-slate-500">Marks Per Correct Answer</span>
+            <span class="font-bold text-emerald-600">+2 Marks</span>
+          </div>
+          <div class="py-3.5 flex items-center justify-between text-sm">
+            <span class="font-medium text-slate-500">Maximum Aggregate Marks</span>
+            <span class="font-bold text-slate-900">100 Marks</span>
+          </div>
+          <div class="py-3.5 flex items-center justify-between text-sm">
+            <span class="font-medium text-slate-500">Allocated Duration</span>
+            <span class="font-bold text-purple-700">40 Minutes (Server-Enforced)</span>
+          </div>
+          <div class="py-3.5 flex items-center justify-between text-sm">
+            <span class="font-medium text-slate-500">Negative Marking Scheme</span>
+            <span class="font-bold text-slate-700">None (0 Deduction)</span>
+          </div>
+          <div class="py-3.5 flex items-center justify-between text-sm">
+            <span class="font-medium text-slate-500">Difficulty Distribution</span>
+            <span class="font-bold text-slate-900">15 Easy | 25 Medium | 10 Hard</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Performance Categories Card -->
+      <div class="korlance-card p-8">
+        <h3 class="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+          <i data-lucide="award" class="w-5 h-5 text-korlance-primary"></i>
+          <span>Performance Merit Benchmark Categories</span>
+        </h3>
+
+        <div class="space-y-4">
+          <!-- Category 1 -->
+          <div class="p-4 rounded-xl bg-emerald-50/70 border border-emerald-200">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-bold text-emerald-900">Category 1 – Excellent</span>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-200 text-emerald-800">86 – 100 Marks</span>
+            </div>
+            <p class="text-xs text-emerald-700 mt-1.5 leading-relaxed">
+              Demonstrates superior domain mastery, critical problem-solving capacity, and conceptual depth.
+            </p>
+          </div>
+
+          <!-- Category 2 -->
+          <div class="p-4 rounded-xl bg-amber-50/70 border border-amber-200">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-bold text-amber-900">Category 2 – Good</span>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-amber-200 text-amber-800">71 – 85 Marks</span>
+            </div>
+            <p class="text-xs text-amber-700 mt-1.5 leading-relaxed">
+              Demonstrates solid domain competency and technical foundations with opportunity for advanced mastery.
+            </p>
+          </div>
+
+          <!-- Category 3 -->
+          <div class="p-4 rounded-xl bg-rose-50/70 border border-rose-200">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-bold text-rose-900">Category 3 – Needs Improvement</span>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-rose-200 text-rose-800">0 – 70 Marks</span>
+            </div>
+            <p class="text-xs text-rose-700 mt-1.5 leading-relaxed">
+              Requires continued practice and strengthening of core fundamental concepts.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Proctoring Guidelines Row -->
+    <div class="mt-10 korlance-card p-8 bg-gradient-to-r from-purple-900 to-indigo-900 text-white">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+        <div class="space-y-2">
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/10 text-xs font-bold text-purple-200 uppercase tracking-wider">
+            <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
+            <span>Active Proctoring</span>
+          </div>
+          <h4 class="text-xl font-bold">Monitored Examination Security</h4>
+          <p class="text-xs text-purple-200 leading-relaxed">
+            Candidate sessions are monitored in real time. Switching browser tabs, minimizing the assessment window, or covering webcam feed triggers incident audit logs.
+          </p>
+        </div>
+
+        <div class="space-y-2.5 text-xs text-purple-100">
+          <div class="flex items-start gap-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+            <span>Webcam permission required for identity assurance</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+            <span>Tab switching and focus loss logging active</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+            <span>Server-side timer prevents unauthorized resets</span>
+          </div>
+        </div>
+
+        <div class="text-right">
+          <a href="{% url 'register' %}" class="inline-flex items-center gap-2 px-6 py-3 bg-white text-korlance-primary hover:bg-purple-50 font-bold rounded-xl text-sm transition-all shadow-md">
+            <span>Proceed to Candidate Registration</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FAQ Section -->
+<section id="faq-section" class="py-20 bg-white">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-14 space-y-2">
+      <div class="text-xs font-bold text-korlance-primary uppercase tracking-wider">Frequently Asked Questions</div>
+      <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Candidate Help & Guidance</h2>
+    </div>
+
+    <div class="space-y-4">
+      <details class="korlance-card p-5 group cursor-pointer">
+        <summary class="flex items-center justify-between font-bold text-slate-900 text-sm select-none">
+          <span>What happens if my internet connection drops during the examination?</span>
+          <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+        </summary>
+        <p class="text-xs text-slate-600 mt-3 leading-relaxed">
+          The KORLANCE examination engine continuously saves every selected response in real time via secure background requests. If your network temporarily disconnects, you can reload the exam room URL without losing previously saved responses. Note that the 40-minute server timer continues to count down.
+        </p>
+      </details>
+
+      <details class="korlance-card p-5 group cursor-pointer">
+        <summary class="flex items-center justify-between font-bold text-slate-900 text-sm select-none">
+          <span>Can I navigate back and change answers before submitting?</span>
+          <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+        </summary>
+        <p class="text-xs text-slate-600 mt-3 leading-relaxed">
+          Yes. Candidates have full freedom to move between questions using the question palette, Previous/Next buttons, clear answers, or mark questions for review. Responses are only locked upon clicking "Submit Examination" or when the 40-minute countdown reaches zero.
+        </p>
+      </details>
+
+      <details class="korlance-card p-5 group cursor-pointer">
+        <summary class="flex items-center justify-between font-bold text-slate-900 text-sm select-none">
+          <span>When will I receive my score and confirmation email?</span>
+          <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+        </summary>
+        <p class="text-xs text-slate-600 mt-3 leading-relaxed">
+          Evaluation is instantaneous. Upon clicking submit, you are immediately redirected to your comprehensive performance results page displaying marks, accuracy breakdown, and qualifying category. An official confirmation email is automatically sent to your registered email address.
+        </p>
+      </details>
+    </div>
+
+  </div>
+</section>
+{% endblock content %}
+
+{% block extra_scripts %}
+<script>
+  // Domain Search Filter
+  const searchInput = document.getElementById('domainSearchInput');
+  const domainCards = document.querySelectorAll('.domain-card');
+
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase().trim();
+      domainCards.forEach(card => {
+        const name = card.getAttribute('data-name');
+        if (name.includes(term)) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    });
+  }
+</script>
+{% endblock extra_scripts %}

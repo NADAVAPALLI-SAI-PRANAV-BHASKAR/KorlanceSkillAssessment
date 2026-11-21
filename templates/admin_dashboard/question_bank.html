@@ -1,0 +1,194 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+{% load static %}
+
+{% block admin_content %}
+<div class="space-y-6">
+  
+  <!-- Domain Selector & Header -->
+  <div class="korlance-card p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h3 class="text-base font-extrabold text-slate-900">Domain Question Bank Management</h3>
+      <p class="text-xs text-slate-400">Total 1,000 Curated MCQs across 20 Engineering & Management Disciplines</p>
+    </div>
+
+    <!-- Domain Dropdown Switcher -->
+    <form method="GET" action="{% url 'question_bank' %}" class="flex items-center gap-3">
+      <select 
+        name="domain" 
+        onchange="this.form.submit()" 
+        class="text-xs font-bold bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-korlance-primary/30"
+      >
+        {% for d in domains %}
+          <option value="{{ d.id }}" {% if selected_domain.id == d.id %}selected{% endif %}>
+            {{ d.name }} ({{ d.questions.count }} MCQs)
+          </option>
+        {% endfor %}
+      </select>
+
+      <button 
+        type="button" 
+        onclick="document.getElementById('addQuestionModal').classList.remove('hidden')" 
+        class="btn-korlance-primary text-xs py-2.5 px-4 shadow-sm shrink-0"
+      >
+        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+        <span>Add Question</span>
+      </button>
+    </form>
+  </div>
+
+  <!-- Domain Difficulty Distribution Badges -->
+  <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+    <div class="korlance-card p-4 text-center">
+      <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Active Domain Total</div>
+      <div class="text-2xl font-black text-slate-900 mt-1">{{ questions.count }} Questions</div>
+    </div>
+    <div class="korlance-card p-4 text-center bg-emerald-50/50 border-emerald-200">
+      <div class="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Easy Benchmark</div>
+      <div class="text-2xl font-black text-emerald-700 mt-1">{{ easy_count }} Questions</div>
+    </div>
+    <div class="korlance-card p-4 text-center bg-amber-50/50 border-amber-200">
+      <div class="text-[11px] font-bold text-amber-800 uppercase tracking-wider">Medium Benchmark</div>
+      <div class="text-2xl font-black text-amber-700 mt-1">{{ medium_count }} Questions</div>
+    </div>
+    <div class="korlance-card p-4 text-center bg-purple-50/50 border-purple-200">
+      <div class="text-[11px] font-bold text-purple-800 uppercase tracking-wider">Hard Benchmark</div>
+      <div class="text-2xl font-black text-purple-700 mt-1">{{ hard_count }} Questions</div>
+    </div>
+  </div>
+
+  <!-- Questions Table -->
+  <div class="korlance-card overflow-hidden">
+    <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+      <h4 class="text-sm font-extrabold text-slate-900">
+        Question Bank: {{ selected_domain.name }}
+      </h4>
+      <span class="text-xs font-bold text-slate-400">{{ questions.count }} Loaded</span>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-xs">
+        <thead class="bg-slate-50 border-b border-slate-200/80 text-slate-500 uppercase tracking-wider font-bold">
+          <tr>
+            <th class="px-6 py-3.5">#</th>
+            <th class="px-6 py-3.5">Difficulty</th>
+            <th class="px-6 py-3.5">Question Stem</th>
+            <th class="px-6 py-3.5">Options Preview</th>
+            <th class="px-6 py-3.5">Correct Answer Key</th>
+            <th class="px-6 py-3.5">Marks</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 text-slate-700 font-medium">
+          {% for q in questions %}
+          <tr class="hover:bg-slate-50/80 transition-colors">
+            <td class="px-6 py-4 font-mono text-slate-400">#{{ forloop.counter }}</td>
+            <td class="px-6 py-4">
+              {% if q.difficulty == 'EASY' %}
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">EASY</span>
+              {% elif q.difficulty == 'MEDIUM' %}
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">MEDIUM</span>
+              {% else %}
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">HARD</span>
+              {% endif %}
+            </td>
+            <td class="px-6 py-4 font-bold text-slate-900 max-w-md leading-relaxed">
+              {{ q.question_text }}
+            </td>
+            <td class="px-6 py-4 space-y-1 text-[11px] text-slate-500 max-w-xs truncate">
+              <div>A: {{ q.option_a|truncatechars:28 }}</div>
+              <div>B: {{ q.option_b|truncatechars:28 }}</div>
+              <div>C: {{ q.option_c|truncatechars:28 }}</div>
+              <div>D: {{ q.option_d|truncatechars:28 }}</div>
+            </td>
+            <td class="px-6 py-4 font-bold text-emerald-700">
+              Option {{ q.correct_option }}
+            </td>
+            <td class="px-6 py-4 font-mono font-bold text-slate-900">+{{ q.marks }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- Add Question Modal -->
+<div id="addQuestionModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
+      <h3 class="text-base font-extrabold text-slate-900">Add New Domain MCQ</h3>
+      <button onclick="document.getElementById('addQuestionModal').classList.add('hidden')" class="text-slate-400 hover:text-slate-600">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <form method="POST" action="{% url 'question_bank' %}?domain={{ selected_domain.id }}" class="space-y-4 text-xs">
+      {% csrf_token %}
+      <input type="hidden" name="create_question" value="1">
+
+      <div>
+        <label class="block font-bold text-slate-700 uppercase mb-1">Target Domain</label>
+        <input type="text" readonly value="{{ selected_domain.name }}" class="w-full p-2.5 bg-slate-100 border border-slate-200 rounded-lg text-slate-600 font-bold">
+      </div>
+
+      <div>
+        <label class="block font-bold text-slate-700 uppercase mb-1">Question Stem</label>
+        <textarea name="question_text" rows="3" required placeholder="Enter complete question stem..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:bg-white focus:outline-none"></textarea>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block font-bold text-slate-700 uppercase mb-1">Option A</label>
+          <input type="text" name="option_a" required class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 uppercase mb-1">Option B</label>
+          <input type="text" name="option_b" required class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 uppercase mb-1">Option C</label>
+          <input type="text" name="option_c" required class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 uppercase mb-1">Option D</label>
+          <input type="text" name="option_d" required class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block font-bold text-slate-700 uppercase mb-1">Correct Option Key</label>
+          <select name="correct_option" required class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg font-bold text-emerald-700">
+            <option value="A">Option A</option>
+            <option value="B">Option B</option>
+            <option value="C">Option C</option>
+            <option value="D">Option D</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 uppercase mb-1">Difficulty Level</label>
+          <select name="difficulty" required class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg font-bold">
+            <option value="EASY">Easy</option>
+            <option value="MEDIUM" selected>Medium</option>
+            <option value="HARD">Hard</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block font-bold text-slate-700 uppercase mb-1">Technical Rationale / Explanation</label>
+        <textarea name="explanation" rows="2" placeholder="Brief technical justification for the answer key..." class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg"></textarea>
+      </div>
+
+      <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+        <button type="button" onclick="document.getElementById('addQuestionModal').classList.add('hidden')" class="btn-korlance-secondary text-xs">
+          Cancel
+        </button>
+        <button type="submit" class="btn-korlance-primary text-xs py-2.5 px-6">
+          Save Question
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock admin_content %}

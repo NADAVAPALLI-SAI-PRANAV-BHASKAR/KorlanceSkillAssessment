@@ -1,0 +1,121 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+{% load static %}
+
+{% block admin_content %}
+<div class="space-y-6">
+  
+  <!-- Header Card with Batch Dispatch CTA -->
+  <div class="korlance-card p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-gradient-to-r from-purple-50 via-white to-white border-purple-200">
+    <div>
+      <h3 class="text-base font-extrabold text-slate-900">Examination Invitation Engine</h3>
+      <p class="text-xs text-slate-500 mt-1 max-w-xl">
+        Each invited student receives a personalized, secure, domain-locked examination link. Invitations feature KORLANCE corporate branding, duration guidelines, and examination rules.
+      </p>
+      <div class="mt-3 flex items-center gap-3 text-xs font-bold">
+        <span class="px-2.5 py-1 rounded-md bg-purple-100 text-purple-800">Pending: {{ pending_count }}</span>
+        <span class="px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800">Delivered: {{ sent_count }}</span>
+      </div>
+    </div>
+
+    <!-- Batch Dispatch Form -->
+    <form method="POST" action="{% url 'invitations_list' %}">
+      {% csrf_token %}
+      <input type="hidden" name="send_batch_invitations" value="1">
+      
+      <button 
+        type="submit" 
+        {% if pending_count == 0 %}disabled{% endif %} 
+        class="btn-korlance-primary text-xs py-3.5 px-6 shadow-md shrink-0 {% if pending_count == 0 %}opacity-50 cursor-not-allowed{% endif %}"
+        onclick="return confirm('Dispatch examination invitation emails to all {{ pending_count }} pending candidates?');"
+      >
+        <i data-lucide="send" class="w-4 h-4"></i>
+        <span>Send Examination Invitations ({{ pending_count }})</span>
+      </button>
+    </form>
+  </div>
+
+  <!-- Invitations Table -->
+  <div class="korlance-card overflow-hidden">
+    <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+      <h3 class="text-sm font-extrabold text-slate-900">Active Examination Tokens</h3>
+      <span class="text-xs font-bold text-slate-400">Showing recent 100</span>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-xs">
+        <thead class="bg-slate-50 border-b border-slate-200/80 text-slate-500 uppercase tracking-wider font-bold">
+          <tr>
+            <th class="px-6 py-3.5">Candidate</th>
+            <th class="px-6 py-3.5">Assigned Domain</th>
+            <th class="px-6 py-3.5">Unique Token Link</th>
+            <th class="px-6 py-3.5">Email Delivery</th>
+            <th class="px-6 py-3.5">Token Status</th>
+            <th class="px-6 py-3.5">Generated On</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 text-slate-700 font-medium">
+          {% for inv in invitations %}
+          <tr class="hover:bg-slate-50/80 transition-colors">
+            <td class="px-6 py-4">
+              <div class="font-bold text-slate-900">{{ inv.student.full_name }}</div>
+              <div class="text-[11px] text-slate-400 font-mono">{{ inv.student.email }}</div>
+            </td>
+            <td class="px-6 py-4 font-semibold text-korlance-primary">{{ inv.domain.name }}</td>
+            <td class="px-6 py-4">
+              <div class="flex items-center gap-2">
+                <input 
+                  type="text" 
+                  readonly 
+                  value="{{ request.scheme }}://{{ request.get_host }}{% url 'register' %}?invite={{ inv.token }}" 
+                  class="w-48 text-[11px] font-mono bg-slate-50 border border-slate-200 rounded px-2 py-1 text-slate-600 truncate select-all"
+                >
+                <a 
+                  href="{% url 'register' %}?invite={{ inv.token }}" 
+                  target="_blank" 
+                  class="text-korlance-primary hover:text-korlance-deep p-1" 
+                  title="Open candidate link"
+                >
+                  <i data-lucide="external-link" class="w-4 h-4"></i>
+                </a>
+              </div>
+            </td>
+            <td class="px-6 py-4">
+              {% if inv.email_sent %}
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <i data-lucide="check" class="w-3 h-3"></i>
+                  <span>Delivered</span>
+                </span>
+              {% else %}
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                  <i data-lucide="clock" class="w-3 h-3"></i>
+                  <span>Queued</span>
+                </span>
+              {% endif %}
+            </td>
+            <td class="px-6 py-4">
+              {% if inv.is_used %}
+                <span class="text-slate-400 font-bold">Used / Attempted</span>
+              {% elif inv.is_expired %}
+                <span class="text-rose-600 font-bold">Expired</span>
+              {% else %}
+                <span class="text-emerald-600 font-bold">Active & Valid</span>
+              {% endif %}
+            </td>
+            <td class="px-6 py-4 text-slate-400 text-[11px] font-mono">
+              {{ inv.created_at|date:"Y-m-d H:i" }}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="px-6 py-10 text-center text-slate-400">
+              No examination invitations have been created yet. Upload an Excel roster to get started.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock admin_content %}

@@ -1,0 +1,189 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{{ page_title|default:"KORLANCE — Online Examination & Assessment Platform" }}{% endblock %}</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="{% static 'images/korlance_mark.svg' %}">
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            korlance: {
+              primary: '#5213B3',
+              deep: '#400C92',
+              accent: '#A855F7',
+              light: '#F3EAFE',
+              bg: '#F8F7FC',
+              text: '#211A2E',
+              muted: '#777184'
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Chart.js CDN for Admin Analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Custom Korlance Enterprise Stylesheet -->
+  <link rel="stylesheet" href="{% static 'css/korlance.css' %}">
+  
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-[#F8F7FC] text-[#211A2E] flex flex-col min-vh-100 antialiased selection:bg-[#F3EAFE] selection:text-[#5213B3]">
+
+  {% block navbar %}
+  <!-- Enterprise Header / Navbar -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 transition-all shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        
+        <!-- Official Brand Logo -->
+        <a href="{% url 'home' %}" class="flex items-center space-x-3 group select-none">
+          <img src="{% static 'images/korlance_logo.svg' %}" alt="KORLANCE PRIVATE LIMITED" class="h-12 w-auto object-contain transition-transform group-hover:scale-[1.02]">
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <nav class="hidden md:flex items-center space-x-8 text-sm font-semibold">
+          <a href="{% url 'home' %}" class="text-slate-600 hover:text-korlance-primary transition-colors">Overview</a>
+          <a href="{% url 'home' %}#domains-section" class="text-slate-600 hover:text-korlance-primary transition-colors">Assessment Domains</a>
+          <a href="{% url 'home' %}#guidelines-section" class="text-slate-600 hover:text-korlance-primary transition-colors">Examination Rules</a>
+          <a href="{% url 'home' %}#faq-section" class="text-slate-600 hover:text-korlance-primary transition-colors">Candidate FAQs</a>
+        </nav>
+
+        <!-- CTAs -->
+        <div class="flex items-center space-x-3">
+          {% if user.is_authenticated and user.is_staff %}
+            <a href="{% url 'admin_dashboard' %}" class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-korlance-primary bg-korlance-light border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors">
+              <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+              <span>Admin Console</span>
+            </a>
+            <a href="{% url 'admin_logout' %}" class="text-xs font-semibold text-slate-500 hover:text-rose-600 transition-colors">Sign Out</a>
+          {% else %}
+            <a href="{% url 'admin_login' %}" class="text-xs font-bold text-slate-600 hover:text-korlance-primary px-3 py-2 rounded-lg hover:bg-slate-100 transition-colors inline-flex items-center gap-1">
+              <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+              <span>Admin Portal</span>
+            </a>
+            <a href="{% url 'register' %}" class="btn-korlance-primary text-xs uppercase tracking-wider py-2.5 px-4 shadow-sm">
+              <span>Start Assessment</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+  </header>
+  {% endblock navbar %}
+
+  <!-- Notification Toasts / Django Messages -->
+  {% if messages %}
+  <div class="max-w-5xl mx-auto px-4 mt-4 w-full">
+    {% for message in messages %}
+      <div class="p-4 mb-3 rounded-xl border flex items-center justify-between text-sm font-medium {% if message.tags == 'error' %}bg-rose-50 text-rose-800 border-rose-200{% elif message.tags == 'success' %}bg-emerald-50 text-emerald-800 border-emerald-200{% else %}bg-purple-50 text-purple-800 border-purple-200{% endif %}">
+        <div class="flex items-center gap-2">
+          <i data-lucide="info" class="w-4 h-4"></i>
+          <span>{{ message }}</span>
+        </div>
+        <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Main View Block -->
+  <main class="flex-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  {% block footer %}
+  <!-- Enterprise Footer -->
+  <footer class="bg-white border-t border-slate-200/80 mt-20 pt-16 pb-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+        
+        <!-- Company Identity -->
+        <div class="md:col-span-2 space-y-4">
+          <img src="{% static 'images/korlance_logo.svg' %}" alt="KORLANCE PRIVATE LIMITED" class="h-10 w-auto">
+          <p class="text-sm text-slate-500 max-w-md leading-relaxed">
+            KORLANCE PRIVATE LIMITED is an enterprise technology and workforce skill assessment organization delivering certified proctored evaluations, industrial diagnostic benchmarks, and corporate talent programs.
+          </p>
+          <div class="flex items-center gap-2 text-xs font-bold text-korlance-primary tracking-wider uppercase">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span>BUILD TODAY, LEAD TOMORROW.</span>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div>
+          <h4 class="text-xs font-bold tracking-wider text-slate-900 uppercase mb-4">Assessment Links</h4>
+          <ul class="space-y-2.5 text-sm text-slate-600 font-medium">
+            <li><a href="{% url 'register' %}" class="hover:text-korlance-primary transition-colors">Candidate Registration</a></li>
+            <li><a href="{% url 'home' %}#domains-section" class="hover:text-korlance-primary transition-colors">20 Technical Domains</a></li>
+            <li><a href="{% url 'home' %}#guidelines-section" class="hover:text-korlance-primary transition-colors">Examination Pattern</a></li>
+            <li><a href="{% url 'admin_login' %}" class="hover:text-korlance-primary transition-colors">Admin Controller Sign-In</a></li>
+          </ul>
+        </div>
+
+        <!-- Corporate Contact -->
+        <div>
+          <h4 class="text-xs font-bold tracking-wider text-slate-900 uppercase mb-4">Support & Administration</h4>
+          <ul class="space-y-2.5 text-sm text-slate-600 font-medium">
+            <li class="flex items-center gap-2">
+              <i data-lucide="mail" class="w-4 h-4 text-purple-600"></i>
+              <span>Shaikbaji15102002@gmail.com</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <i data-lucide="shield-check" class="w-4 h-4 text-purple-600"></i>
+              <span>ISO 27001 Proctoring Standards</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <i data-lucide="clock" class="w-4 h-4 text-purple-600"></i>
+              <span>40-Min Timed Diagnostic Sessions</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="border-t border-slate-100 pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4">
+        <p>© {{ CURRENT_YEAR }} KORLANCE PRIVATE LIMITED. All rights reserved. Confidential examination infrastructure.</p>
+        <p class="flex items-center gap-1 font-semibold text-slate-500">
+          <span>Enterprise Assessment Engine v2.6</span>
+          <span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+          <span>Secured with AI Proctoring</span>
+        </p>
+      </div>
+    </div>
+  </footer>
+  {% endblock footer %}
+
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+  </script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

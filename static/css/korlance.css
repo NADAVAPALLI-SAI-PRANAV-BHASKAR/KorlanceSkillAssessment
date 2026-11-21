@@ -1,0 +1,197 @@
+/* ========================================================
+   KORLANCE ENTERPRISE DESIGN SYSTEM & CSS TOKENS
+   Company: KORLANCE PRIVATE LIMITED
+   Tagline: BUILD TODAY, LEAD TOMORROW.
+   ======================================================== */
+
+:root {
+  --korlance-primary: #5213B3;
+  --korlance-deep: #400C92;
+  --korlance-accent: #A855F7;
+  --korlance-light: #F3EAFE;
+  --korlance-white: #FFFFFF;
+  --korlance-bg: #F8F7FC;
+  --korlance-text-main: #211A2E;
+  --korlance-text-muted: #777184;
+
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--korlance-bg);
+  color: var(--korlance-text-main);
+  min-height: 100vh;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: #F1F0F7;
+}
+::-webkit-scrollbar-thumb {
+  background: #C4B5FD;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--korlance-primary);
+}
+
+/* Corporate Buttons */
+.btn-korlance-primary {
+  background: linear-gradient(135deg, var(--korlance-primary) 0%, var(--korlance-deep) 100%);
+  color: #FFFFFF;
+  font-weight: 600;
+  border-radius: 0.65rem;
+  padding: 0.65rem 1.4rem;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 14px 0 rgba(82, 19, 179, 0.28);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.btn-korlance-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px 0 rgba(82, 19, 179, 0.36);
+  color: #FFFFFF;
+}
+.btn-korlance-primary:active {
+  transform: translateY(0);
+}
+
+.btn-korlance-secondary {
+  background-color: #FFFFFF;
+  color: var(--korlance-primary);
+  border: 1.5px solid #E9D5FF;
+  font-weight: 600;
+  border-radius: 0.65rem;
+  padding: 0.6rem 1.3rem;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.btn-korlance-secondary:hover {
+  background-color: var(--korlance-light);
+  border-color: var(--korlance-accent);
+}
+
+/* Enterprise Cards */
+.korlance-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px -2px rgba(82, 19, 179, 0.05);
+  transition: all 0.25s ease;
+}
+.korlance-card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -4px rgba(82, 19, 179, 0.12);
+  border-color: #D8B4FE;
+}
+
+/* Question Palette Grid Items */
+.palette-btn {
+  width: 38px;
+  height: 38px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Palette Status Colors (As specified in Part 6) */
+/* Green: Answered */
+.status-answered {
+  background-color: #10B981 !important;
+  color: #FFFFFF !important;
+  border: 1px solid #059669 !important;
+}
+/* Red: Not Answered (visited, not answered) */
+.status-unanswered {
+  background-color: #EF4444 !important;
+  color: #FFFFFF !important;
+  border: 1px solid #DC2626 !important;
+}
+/* Purple: Marked for Review */
+.status-review {
+  background-color: #7C3AED !important;
+  color: #FFFFFF !important;
+  border: 1px solid #6D28D9 !important;
+}
+/* Grey: Not Visited */
+.status-unvisited {
+  background-color: #F3F4F6 !important;
+  color: #6B7280 !important;
+  border: 1px solid #E5E7EB !important;
+}
+/* Green with Review Indicator: Answered and Marked for Review */
+.status-answered-review {
+  background-color: #10B981 !important;
+  color: #FFFFFF !important;
+  border: 2px solid #7C3AED !important;
+  position: relative;
+}
+.status-answered-review::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 9px;
+  height: 9px;
+  background-color: #7C3AED;
+  border-radius: 50%;
+  border: 1.5px solid #FFFFFF;
+}
+
+/* Current Active Question Ring */
+.palette-btn.active-q {
+  outline: 2px solid #5213B3;
+  outline-offset: 2px;
+  transform: scale(1.08);
+}
+
+/* Live Video Preview Box */
+.proctor-cam-box {
+  position: relative;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: #111827;
+  aspect-ratio: 4 / 3;
+  border: 2px solid #E5E7EB;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.proctor-cam-box video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1); /* Mirror view */
+}
+
+/* Pulse indicator */
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #10B981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: pulse-ring 1.8s infinite;
+}
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}

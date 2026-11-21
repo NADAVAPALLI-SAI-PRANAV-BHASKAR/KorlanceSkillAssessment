@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Candidate Registration — KORLANCE Online Assessment{% endblock %}
+
+{% block content %}
+<div class="min-h-[85vh] py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+  <div class="max-w-xl w-full">
+    
+    <!-- Registration Card -->
+    <div class="korlance-card p-8 sm:p-10 shadow-lg border-purple-100/80">
+      
+      <!-- Brand Logo Header -->
+      <div class="text-center space-y-3 mb-8">
+        <a href="{% url 'home' %}" class="inline-block">
+          <img src="{% static 'images/korlance_logo.svg' %}" alt="KORLANCE PRIVATE LIMITED" class="h-12 w-auto mx-auto">
+        </a>
+        <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Candidate Registration</h2>
+        <p class="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
+          Please provide your official candidate credentials to access the 40-minute proctored examination environment.
+        </p>
+
+        {% if locked_domain %}
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-purple-50 border border-purple-200 text-xs font-bold text-korlance-primary">
+          <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+          <span>Assigned Domain: {{ locked_domain.name }} (Verified Invitation)</span>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Registration Form -->
+      <form method="POST" action="{% url 'register' %}{% if invitation %}?invite={{ invitation.token }}{% endif %}" class="space-y-5">
+        {% csrf_token %}
+
+        <!-- Full Name -->
+        <div>
+          <label for="full_name" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+            Full Name <span class="text-rose-500">*</span>
+          </label>
+          <div class="relative">
+            <input 
+              type="text" 
+              id="full_name" 
+              name="full_name" 
+              required 
+              placeholder="e.g. Johnathan Doe" 
+              class="w-full pl-10 pr-4 py-3 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-korlance-primary/30 focus:border-korlance-primary font-medium text-slate-900"
+            >
+            <i data-lucide="user" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5"></i>
+          </div>
+        </div>
+
+        <!-- Mobile Number -->
+        <div>
+          <label for="mobile_number" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+            Mobile Number <span class="text-rose-500">*</span>
+          </label>
+          <div class="relative">
+            <input 
+              type="tel" 
+              id="mobile_number" 
+              name="mobile_number" 
+              required 
+              placeholder="e.g. +91 9876543210" 
+              class="w-full pl-10 pr-4 py-3 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-korlance-primary/30 focus:border-korlance-primary font-medium text-slate-900"
+            >
+            <i data-lucide="phone" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5"></i>
+          </div>
+        </div>
+
+        <!-- Email Address -->
+        <div>
+          <label for="email" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+            Email ID <span class="text-rose-500">*</span>
+          </label>
+          <div class="relative">
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              required 
+              placeholder="candidate@organization.com" 
+              class="w-full pl-10 pr-4 py-3 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-korlance-primary/30 focus:border-korlance-primary font-medium text-slate-900"
+            >
+            <i data-lucide="mail" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5"></i>
+          </div>
+        </div>
+
+        <!-- Domain Selection (20 Domains) -->
+        <div>
+          <label for="domain_id" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+            Examination Domain <span class="text-rose-500">*</span>
+          </label>
+          <div class="relative">
+            {% if locked_domain %}
+              <input type="hidden" name="domain_id" value="{{ locked_domain.id }}">
+              <div class="w-full pl-10 pr-4 py-3 text-sm bg-purple-50/70 border border-purple-200 rounded-xl text-korlance-primary font-bold flex items-center justify-between">
+                <span>{{ locked_domain.name }}</span>
+                <span class="text-xs font-bold text-purple-600 bg-purple-100 px-2 py-0.5 rounded">Locked</span>
+              </div>
+            {% else %}
+              <select 
+                id="domain_id" 
+                name="domain_id" 
+                required 
+                class="w-full pl-10 pr-8 py-3 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-korlance-primary/30 focus:border-korlance-primary font-medium text-slate-900 appearance-none"
+              >
+                <option value="" disabled selected>— Select Assessment Domain (20 Disciplines) —</option>
+                {% for d in domains %}
+                  <option value="{{ d.id }}" {% if request.GET.domain == d.id|stringformat:"i" %}selected{% endif %}>
+                    {{ d.name }}
+                  </option>
+                {% endfor %}
+              </select>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 absolute right-3.5 top-3.5 pointer-events-none"></i>
+            {% endif %}
+            <i data-lucide="layers" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none"></i>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-1.5">
+            The examination question bank will strictly correspond to your selected technical discipline.
+          </p>
+        </div>
+
+        <!-- Next / Proceed Button -->
+        <div class="pt-4">
+          <button type="submit" class="btn-korlance-primary w-full py-3.5 text-sm uppercase tracking-wider font-bold shadow-md">
+            <span>Next: Examination Instructions</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+      </form>
+
+      <!-- Bottom Security Notice -->
+      <div class="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+        <span class="flex items-center gap-1.5 font-medium">
+          <i data-lucide="lock" class="w-3.5 h-3.5 text-purple-600"></i>
+          <span>256-Bit SSL Encrypted Session</span>
+        </span>
+        <span class="font-bold text-slate-500">BUILD TODAY, LEAD TOMORROW.</span>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+{% endblock content %}

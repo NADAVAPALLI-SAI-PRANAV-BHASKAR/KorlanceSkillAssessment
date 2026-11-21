@@ -1,0 +1,256 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+{% load static %}
+
+{% block admin_content %}
+<div class="space-y-8">
+  
+  <!-- KPI Metrics Grid (10 Metrics as Required in Part 10) -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+    
+    <!-- 1. Registered Students -->
+    <div class="korlance-card p-5">
+      <div class="flex items-center justify-between text-slate-400 mb-2">
+        <span class="text-xs font-bold uppercase tracking-wider">Total Registered</span>
+        <i data-lucide="users" class="w-4 h-4 text-korlance-primary"></i>
+      </div>
+      <div class="text-2xl font-black text-slate-900">{{ total_students }}</div>
+      <div class="text-[11px] font-semibold text-slate-400 mt-1">Candidates in system</div>
+    </div>
+
+    <!-- 2. Invitations Sent -->
+    <div class="korlance-card p-5">
+      <div class="flex items-center justify-between text-slate-400 mb-2">
+        <span class="text-xs font-bold uppercase tracking-wider">Invitations Sent</span>
+        <i data-lucide="mail" class="w-4 h-4 text-purple-600"></i>
+      </div>
+      <div class="text-2xl font-black text-slate-900">{{ invitations_sent }}</div>
+      <div class="text-[11px] font-semibold text-slate-400 mt-1">Via automated SMTP</div>
+    </div>
+
+    <!-- 3. Attempted Exams -->
+    <div class="korlance-card p-5">
+      <div class="flex items-center justify-between text-slate-400 mb-2">
+        <span class="text-xs font-bold uppercase tracking-wider">Attempted Sessions</span>
+        <i data-lucide="play-circle" class="w-4 h-4 text-blue-600"></i>
+      </div>
+      <div class="text-2xl font-black text-slate-900">{{ total_attempts }}</div>
+      <div class="text-[11px] font-semibold text-slate-400 mt-1">Active + Finalized</div>
+    </div>
+
+    <!-- 4. Completed Exams -->
+    <div class="korlance-card p-5">
+      <div class="flex items-center justify-between text-slate-400 mb-2">
+        <span class="text-xs font-bold uppercase tracking-wider">Completed Exams</span>
+        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i>
+      </div>
+      <div class="text-2xl font-black text-emerald-700">{{ completed_exams }}</div>
+      <div class="text-[11px] font-semibold text-slate-400 mt-1">Fully evaluated</div>
+    </div>
+
+    <!-- 5. Pending Exams -->
+    <div class="korlance-card p-5">
+      <div class="flex items-center justify-between text-slate-400 mb-2">
+        <span class="text-xs font-bold uppercase tracking-wider">Pending Exams</span>
+        <i data-lucide="clock" class="w-4 h-4 text-amber-600"></i>
+      </div>
+      <div class="text-2xl font-black text-amber-700">{{ pending_exams }}</div>
+      <div class="text-[11px] font-semibold text-slate-400 mt-1">Awaiting candidate start</div>
+    </div>
+
+  </div>
+
+  <!-- Performance Categories & Average Score Row -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+    
+    <!-- Category 1 Count -->
+    <div class="korlance-card p-5 bg-emerald-50/50 border-emerald-200">
+      <div class="text-xs font-bold text-emerald-800 uppercase tracking-wider mb-1">Category 1 (86–100)</div>
+      <div class="text-2xl font-black text-emerald-700">{{ cat_1_count }}</div>
+      <div class="text-[11px] font-semibold text-emerald-600 mt-1">Excellent Performance</div>
+    </div>
+
+    <!-- Category 2 Count -->
+    <div class="korlance-card p-5 bg-amber-50/50 border-amber-200">
+      <div class="text-xs font-bold text-amber-800 uppercase tracking-wider mb-1">Category 2 (71–85)</div>
+      <div class="text-2xl font-black text-amber-700">{{ cat_2_count }}</div>
+      <div class="text-[11px] font-semibold text-amber-600 mt-1">Good Performance</div>
+    </div>
+
+    <!-- Category 3 Count -->
+    <div class="korlance-card p-5 bg-rose-50/50 border-rose-200">
+      <div class="text-xs font-bold text-rose-800 uppercase tracking-wider mb-1">Category 3 (0–70)</div>
+      <div class="text-2xl font-black text-rose-700">{{ cat_3_count }}</div>
+      <div class="text-[11px] font-semibold text-rose-600 mt-1">Needs Improvement</div>
+    </div>
+
+    <!-- Average Marks -->
+    <div class="korlance-card p-5">
+      <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Average Score</div>
+      <div class="text-2xl font-black text-korlance-primary">{{ avg_score }} <span class="text-sm font-bold text-slate-400">/ 100</span></div>
+      <div class="text-[11px] font-semibold text-slate-400 mt-1">Across all completed</div>
+    </div>
+
+    <!-- Proctoring Incident Summary -->
+    <div class="korlance-card p-5">
+      <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Proctoring Alerts</div>
+      <div class="text-2xl font-black text-rose-600">{{ total_incidents }}</div>
+      <div class="text-[11px] font-semibold text-slate-400 mt-1">{{ flagged_attempts_count }} Flagged Candidate(s)</div>
+    </div>
+
+  </div>
+
+  <!-- Interactive Charts Section -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    
+    <!-- Domain Distribution Bar Chart (7 Cols) -->
+    <div class="lg:col-span-7 korlance-card p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-sm font-extrabold text-slate-900 tracking-tight">Domain Examination Distribution</h3>
+        <span class="text-xs font-bold text-slate-400">Top Assessed Tracks</span>
+      </div>
+      <div class="h-64">
+        <canvas id="domainDistributionChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Performance Categories Doughnut Chart (5 Cols) -->
+    <div class="lg:col-span-5 korlance-card p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-sm font-extrabold text-slate-900 tracking-tight">Merit Category Ratios</h3>
+        <span class="text-xs font-bold text-slate-400">Evaluation Breakdown</span>
+      </div>
+      <div class="h-64 flex items-center justify-center">
+        <canvas id="categoryRatioChart"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Recent Attempts Table -->
+  <div class="korlance-card overflow-hidden">
+    <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+      <h3 class="text-sm font-extrabold text-slate-900">Recent Candidate Examination Attempts</h3>
+      <a href="{% url 'students_list' %}" class="text-xs font-bold text-korlance-primary hover:underline">View All Candidates →</a>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-xs">
+        <thead class="bg-slate-50 border-b border-slate-200/80 text-slate-500 uppercase tracking-wider font-bold">
+          <tr>
+            <th class="px-6 py-3.5">Candidate Name</th>
+            <th class="px-6 py-3.5">Assessed Domain</th>
+            <th class="px-6 py-3.5">Status</th>
+            <th class="px-6 py-3.5">Score</th>
+            <th class="px-6 py-3.5">Category</th>
+            <th class="px-6 py-3.5">Timestamp</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 text-slate-700 font-medium">
+          {% for a in recent_attempts %}
+          <tr class="hover:bg-slate-50/80 transition-colors">
+            <td class="px-6 py-4 font-bold text-slate-900">
+              {{ a.student.full_name }}
+              <div class="text-[10px] text-slate-400 font-mono">{{ a.student.email }}</div>
+            </td>
+            <td class="px-6 py-4 font-semibold text-korlance-primary">{{ a.domain.name }}</td>
+            <td class="px-6 py-4">
+              {% if a.is_submitted %}
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  Completed
+                </span>
+              {% else %}
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                  In Progress
+                </span>
+              {% endif %}
+            </td>
+            <td class="px-6 py-4 font-bold">
+              {% if a.is_submitted %}
+                {{ a.total_score|floatformat:1 }} / 100
+              {% else %}
+                —
+              {% endif %}
+            </td>
+            <td class="px-6 py-4">
+              {% if a.is_submitted %}
+                <span class="font-bold text-xs {% if a.performance_category == 'CATEGORY_1' %}text-emerald-700{% elif a.performance_category == 'CATEGORY_2' %}text-amber-700{% else %}text-rose-700{% endif %}">
+                  {{ a.get_performance_category_display }}
+                </span>
+              {% else %}
+                <span class="text-slate-400">Pending Evaluation</span>
+              {% endif %}
+            </td>
+            <td class="px-6 py-4 text-slate-400 text-[11px] font-mono">
+              {{ a.started_at|date:"Y-m-d H:i" }}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="px-6 py-8 text-center text-slate-400">
+              No examination attempts recorded yet.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock admin_content %}
+
+{% block extra_scripts %}
+<script>
+  // Domain Distribution Chart
+  const domainLabels = {{ domain_labels_json|safe }};
+  const domainCounts = {{ domain_counts_json|safe }};
+
+  const ctxDomain = document.getElementById('domainDistributionChart').getContext('2d');
+  new Chart(ctxDomain, {
+    type: 'bar',
+    data: {
+      labels: domainLabels,
+      datasets: [{
+        label: 'Completed Examinations',
+        data: domainCounts,
+        backgroundColor: '#5213B3',
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        y: { beginAtZero: true, ticks: { precision: 0 } },
+        x: { ticks: { font: { size: 10 } } }
+      }
+    }
+  });
+
+  // Category Ratio Doughnut Chart
+  const catData = {{ cat_data_json|safe }};
+  const ctxCat = document.getElementById('categoryRatioChart').getContext('2d');
+  new Chart(ctxCat, {
+    type: 'doughnut',
+    data: {
+      labels: ['Category 1 (Excellent)', 'Category 2 (Good)', 'Category 3 (Needs Impr.)'],
+      datasets: [{
+        data: catData,
+        backgroundColor: ['#10B981', '#F59E0B', '#EF4444'],
+        borderWidth: 2,
+        borderColor: '#FFFFFF'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+      }
+    }
+  });
+</script>
+{% endblock extra_scripts %}

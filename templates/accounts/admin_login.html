@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Administrator Sign-In — KORLANCE Assessment Portal{% endblock %}
+
+{% block navbar %}
+<!-- Minimal Navbar for Admin Login -->
+<header class="bg-white border-b border-slate-200/90 py-4 shadow-2xs">
+  <div class="max-w-7xl mx-auto px-4 flex items-center justify-between">
+    <a href="{% url 'home' %}">
+      <img src="{% static 'images/korlance_logo.svg' %}" alt="KORLANCE" class="h-10 w-auto">
+    </a>
+    <a href="{% url 'home' %}" class="text-xs font-bold text-slate-500 hover:text-korlance-primary flex items-center gap-1">
+      <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+      <span>Candidate Portal</span>
+    </a>
+  </div>
+</header>
+{% endblock navbar %}
+
+{% block content %}
+<div class="min-h-[80vh] flex items-center justify-center px-4 py-12">
+  <div class="max-w-md w-full">
+    
+    <div class="korlance-card p-8 sm:p-10 shadow-xl border-purple-100">
+      
+      <div class="text-center space-y-3 mb-8">
+        <div class="w-12 h-12 rounded-2xl bg-korlance-light text-korlance-primary flex items-center justify-center mx-auto shadow-xs">
+          <i data-lucide="shield" class="w-6 h-6"></i>
+        </div>
+        <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Controller Sign-In</h2>
+        <p class="text-xs text-slate-500">
+          Enter authorized administrative credentials to access candidate evaluations, proctoring logs, and Excel exports.
+        </p>
+      </div>
+
+      <form method="POST" action="{% url 'admin_login' %}" class="space-y-5">
+        {% csrf_token %}
+
+        <!-- Username or Email -->
+        <div>
+          <label for="username_or_email" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+            Admin Email or Username
+          </label>
+          <div class="relative">
+            <input 
+              type="text" 
+              id="username_or_email" 
+              name="username_or_email" 
+              required 
+              placeholder="admin@korlance.com" 
+              class="w-full pl-10 pr-4 py-3 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-korlance-primary/30 focus:border-korlance-primary font-medium text-slate-900"
+            >
+            <i data-lucide="user-check" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5"></i>
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label for="password" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+            Password
+          </label>
+          <div class="relative">
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              required 
+              placeholder="••••••••••••" 
+              class="w-full pl-10 pr-4 py-3 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-korlance-primary/30 focus:border-korlance-primary font-medium text-slate-900"
+            >
+            <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5"></i>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="pt-2">
+          <button type="submit" class="btn-korlance-primary w-full py-3.5 text-sm uppercase tracking-wider font-bold shadow-md">
+            <i data-lucide="log-in" class="w-4 h-4"></i>
+            <span>Authenticate Session</span>
+          </button>
+        </div>
+
+      </form>
+
+      <div class="mt-8 pt-6 border-t border-slate-100 text-center text-xs text-slate-400">
+        Default Assessment Controller: <b class="text-slate-600">admin</b> | <b class="text-slate-600">Shaikbaji15102002@gmail.com</b>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+{% endblock content %}

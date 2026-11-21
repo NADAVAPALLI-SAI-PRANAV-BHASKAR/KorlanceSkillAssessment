@@ -1,0 +1,146 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+{% load static %}
+
+{% block admin_content %}
+<div class="space-y-8 max-w-5xl">
+  
+  <!-- Upload Guidelines Card -->
+  <div class="korlance-card p-6 bg-gradient-to-r from-purple-50/80 via-white to-white border-purple-200">
+    <div class="flex items-start gap-4">
+      <div class="w-12 h-12 rounded-xl bg-purple-100 text-korlance-primary flex items-center justify-center shrink-0">
+        <i data-lucide="file-spreadsheet" class="w-6 h-6"></i>
+      </div>
+      <div>
+        <h3 class="text-base font-extrabold text-slate-900">Excel Candidate Roster Ingestion System</h3>
+        <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+          Upload bulk candidate rosters from campus recruitment or training drives. The system automatically validates records, verifies domain mapping against the 20 official disciplines, checks email formatting, detects duplicates, and prepares unique secure assessment invitation links.
+        </p>
+        <div class="mt-3 flex flex-wrap gap-2 text-[11px] font-bold text-slate-500">
+          <span class="px-2 py-0.5 rounded bg-white border border-slate-200">Required Column: Student Name</span>
+          <span class="px-2 py-0.5 rounded bg-white border border-slate-200">Required Column: Mobile Number</span>
+          <span class="px-2 py-0.5 rounded bg-white border border-slate-200">Required Column: Email ID</span>
+          <span class="px-2 py-0.5 rounded bg-white border border-slate-200">Required Column: Selected Domain</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload Form Box -->
+  <div class="korlance-card p-8 text-center border-dashed border-2 border-slate-300 hover:border-korlance-primary transition-colors">
+    <form method="POST" enctype="multipart/form-data" action="{% url 'excel_upload' %}">
+      {% csrf_token %}
+
+      <div class="max-w-md mx-auto space-y-4">
+        <i data-lucide="cloud-upload" class="w-12 h-12 text-korlance-primary mx-auto animate-bounce"></i>
+        
+        <div>
+          <h4 class="text-sm font-bold text-slate-900">Select Spreadsheet File (.xlsx or .xls)</h4>
+          <p class="text-xs text-slate-400 mt-1">Upload candidate roster for automated pre-import validation</p>
+        </div>
+
+        <input 
+          type="file" 
+          name="excel_file" 
+          accept=".xlsx, .xls" 
+          required 
+          class="block w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-purple-50 file:text-korlance-primary hover:file:bg-purple-100 cursor-pointer"
+        >
+
+        <button type="submit" class="btn-korlance-primary w-full py-2.5 text-xs">
+          <span>Validate & Preview Spreadsheet</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Validation Preview Table (If File Uploaded) -->
+  {% if preview_data %}
+  <div class="korlance-card p-6 space-y-6">
+    
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-4">
+      <div>
+        <h3 class="text-base font-extrabold text-slate-900">Pre-Import Validation Summary</h3>
+        <p class="text-xs text-slate-500">Please review detected rows before confirming database ingestion.</p>
+      </div>
+
+      <div class="flex items-center gap-3 text-xs font-bold">
+        <span class="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+          {{ preview_data.valid_count }} Valid Records
+        </span>
+        {% if preview_data.invalid_count > 0 %}
+        <span class="px-3 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200">
+          {{ preview_data.invalid_count }} Incomplete / Errors
+        </span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Preview Table -->
+    <div class="overflow-x-auto max-h-96">
+      <table class="w-full text-left text-xs">
+        <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider font-bold sticky top-0">
+          <tr>
+            <th class="px-4 py-2.5">Row</th>
+            <th class="px-4 py-2.5">Student Name</th>
+            <th class="px-4 py-2.5">Mobile</th>
+            <th class="px-4 py-2.5">Email ID</th>
+            <th class="px-4 py-2.5">Domain in Excel</th>
+            <th class="px-4 py-2.5">Mapped Discipline</th>
+            <th class="px-4 py-2.5">Status</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 text-slate-700">
+          {% for r in preview_data.records %}
+          <tr class="{% if not r.is_valid %}bg-rose-50/50{% endif %}">
+            <td class="px-4 py-3 font-mono text-slate-400">#{{ r.row_num }}</td>
+            <td class="px-4 py-3 font-bold text-slate-900">{{ r.name|default:"[Missing]" }}</td>
+            <td class="px-4 py-3 font-mono">{{ r.mobile|default:"[Missing]" }}</td>
+            <td class="px-4 py-3 font-mono">{{ r.email|default:"[Missing]" }}</td>
+            <td class="px-4 py-3 text-slate-500">{{ r.domain_raw }}</td>
+            <td class="px-4 py-3 font-semibold text-korlance-primary">{{ r.domain_name }}</td>
+            <td class="px-4 py-3">
+              {% if r.is_valid %}
+                <span class="inline-flex items-center gap-1 text-emerald-600 font-bold">
+                  <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                  <span>Ready</span>
+                </span>
+              {% else %}
+                <span class="text-rose-600 font-bold" title="{{ r.errors|join:', ' }}">
+                  {{ r.errors|join:", " }}
+                </span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Confirm Import Form -->
+    <form method="POST" action="{% url 'excel_upload' %}">
+      {% csrf_token %}
+      <input type="hidden" name="confirm_import" value="1">
+      
+      <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+        <a href="{% url 'excel_upload' %}" class="btn-korlance-secondary text-xs">
+          Cancel & Reset
+        </a>
+
+        <button 
+          type="submit" 
+          {% if preview_data.valid_count == 0 %}disabled{% endif %} 
+          class="btn-korlance-primary text-xs py-3 px-6 shadow-md"
+        >
+          <i data-lucide="check" class="w-4 h-4"></i>
+          <span>Confirm & Import {{ preview_data.valid_count }} Candidates</span>
+        </button>
+      </div>
+    </form>
+
+  </div>
+  {% endif %}
+
+</div>
+{% endblock admin_content %}

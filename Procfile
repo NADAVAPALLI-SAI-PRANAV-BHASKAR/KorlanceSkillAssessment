@@ -1,0 +1,1 @@
+web: gunicorn korlance_assessment.wsgi:application

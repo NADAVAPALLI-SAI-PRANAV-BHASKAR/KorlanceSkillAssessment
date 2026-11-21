@@ -1,0 +1,24 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment & Local Secrets
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Database (Will be seeded automatically on host via build.sh)
+*.sqlite3-journal
+
+# Media user uploads
+media/reports/*
+media/certificates/*
+!media/reports/.gitkeep
+!media/certificates/.gitkeep
+
+# Operating System Files
+.DS_Store
+Thumbs.db
